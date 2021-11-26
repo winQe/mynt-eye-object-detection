@@ -24,10 +24,6 @@
 
 #include "CDNeuralNet.hpp"
 
-#ifdef USE_NETWORK_DISPLAY
-#include "UdpSender.hpp"
-#endif // USE_NETWORK_DISPLAY
-
 
 using namespace std;
 using namespace MYNTEYE_NAMESPACE;
@@ -48,10 +44,7 @@ double gettimeofday_as_double() {
 	return ts;
 }
 
-
-
 cv::Mat imRGB;
-
 
 void worker_thread(CDNeuralNet _cdNet) {
 	while (true) {
@@ -90,36 +83,9 @@ int main(int argc, char* argv[]) {
 	float _YELLOW_DISTANCE_IN_METERS = 2.0;
 	float _RED_DISTANCE_IN_METERS = 1.0;
 
-#ifdef USE_NETWORK_DISPLAY
-	int local_id = 0;
-	if (argc < 2) {
-		printf("Usage:  %s server_ip_address [local_id]\n", argv[0]);
-		return -1;
-	}
-	if (argc > 2) {
-		local_id = atoi(argv[2]);
-		if (local_id < 0) {
-			local_id = 0;
-		} else if (local_id > 255) {
-			local_id = 0;
-		}
-	}
-	printf("local_id: %d\n", local_id);
-
-	const char* ServerAddress = argv[1];
-	const uint16_t DataRxPort = 3101;
-	const uint16_t ImageRxPort = 3201;
-
-	UdpSender udpSender(ServerAddress, ImageRxPort);
-
-#endif //USE_NETWORK_DISPLAY
-
-	// TODO:
-	// if (config_file) {
-	//   load_config_file();
-	//   change_width_height_and_fps_settings();
-	// }
-
+	// //Initialize ROS Node
+	// ros::init(argc, argv, "object_detection");
+	// ros::NodeHandle n;
 
 	// ---------------------------------------------------------
 	//  BEGIN:  Start MYNT-EYE-D
@@ -162,7 +128,6 @@ int main(int argc, char* argv[]) {
 	// ---------------------------------------------------------
 
 
-
 	// ---------------------------------------------------------
 	//  BEGIN:  Start NN
 	// ---------------------------------------------------------
@@ -178,11 +143,8 @@ int main(int argc, char* argv[]) {
 	//  END:  Start Darknet
 	// ---------------------------------------------------------
 
-#ifdef USE_LOCAL_DISPLAY
-	cv::namedWindow("MYNT-EYE-D", cv::WINDOW_NORMAL);
-#endif // USE_LOCAL_DISPLAY
-
-	//util::Counter counter;
+	//Initialize new OpenCV window to output bounding boxes
+	cv::namedWindow("MYNT-EYE-D", cv::WINDOW_NORMAL); 
 
 	cv::Mat imD;
 	while (true) {
@@ -213,7 +175,6 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
-
 		// White bounding box around the "object-too-close" detector:
 		int depth_min = 200000;  // in integer depth_scale units
 		int all_depth_min = 200000;  // in integer depth_scale units
@@ -228,17 +189,6 @@ int main(int argc, char* argv[]) {
 		float half_w = _RGB_WIDTH / 2.0;
 		float half_h = _RGB_HEIGHT / 2.0;
 
-
-#ifdef USE_NETWORK_DISPLAY
-		// Send all the bounding boxes and distances to the display server:
-		unsigned char metaDataBuffer[1500];  // MTU of ethernet
-
-		struct bbox_packet *bbox_packets;
-		bbox_packets = (struct bbox_packet*) &(metaDataBuffer[4]);
-
-		int pkt_number = 0;
-
-#endif // USE_NETWORK_DISPLAY
 
 		//printf("nboxes: %d\n", nboxes_a);
 
@@ -294,17 +244,6 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
-#ifdef USE_NETWORK_DISPLAY
-			bbox_packets[pkt_number].min_distance = depth_min * depth_scale;
-			bbox_packets[pkt_number].x_min = x_min;
-			bbox_packets[pkt_number].x_max = x_max;
-			bbox_packets[pkt_number].y_min = y_min;
-			bbox_packets[pkt_number].y_max = y_max;
-			pkt_number++;
-
-#endif // USE_NETWORK_DISPLAY
-
-#ifdef USE_LOCAL_DISPLAY
 			if (depth_min < all_depth_min) {
 				all_depth_min = depth_min;
 			}
@@ -318,39 +257,8 @@ int main(int argc, char* argv[]) {
 			} else {
 				cv::rectangle(imRGB, r, cv::Scalar(255,255,255), 9);
 			}
-#endif // USE_LOCAL_DISPLAY
 		}
 
-
-#ifdef USE_NETWORK_DISPLAY
-		// waste 2 bytes to maintain 32-bit boundaries:
-		metaDataBuffer[0] = 0;
-		metaDataBuffer[1] = 0;
-		metaDataBuffer[2] = local_id;
-		metaDataBuffer[3] = (unsigned char) pkt_number;
-
-		int dataSize = 4 + sizeof(struct bbox_packet) * pkt_number;
-
-		//udpSender._sendto(ServerAddress, DataRxPort, metaDataBuffer, dataSize);
-		udpSender._sendto("127.0.0.1", DataRxPort, metaDataBuffer, dataSize);
-
-#ifdef USE_SCANLINE
-		// Get a scan of one row
-		const unsigned char *ptr;
-		unsigned char scanOut[ 1280 * 2 ];  // will be larger than ethernet MTU  :-( ...
-		ptr = imD.ptr(360); // 240 is the middle row (the horizon, in theory)
-		for (int col=0; col < 1280*2; ++col) {
-			scanOut[col] = ptr[col];
-		}
-		//udpSender._sendto(ServerAddress, 3125, scanOut, 1280*2);
-		udpSender._sendto("127.0.0.1", 3125, scanOut, 1280*2);
-#endif // USE_SCANLINE
-
-		//udpSender.sendImage(imRGB);
-#endif // USE_NETWORK_DISPLAY
-
-
-#ifdef USE_LOCAL_DISPLAY
 		float closest = all_depth_min * depth_scale;
 		if (closest < _MAX_DISPLAY_DISTANCE_IN_METERS) {
 			char textBuffer[255];
@@ -363,7 +271,6 @@ int main(int argc, char* argv[]) {
 		cv::setWindowProperty("MYNT-EYE-D", cv::WND_PROP_AUTOSIZE, cv::WINDOW_NORMAL);
 		cv::imshow("MYNT-EYE-D", imRGB);
 		cv::waitKey(1);
-#endif // USE_LOCAL_DISPLAY
 
 		//gettimeofday(&tv, NULL);
 		//printf("ts: %ld.%06ld\n", tv.tv_sec, tv.tv_usec);
