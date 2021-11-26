@@ -1,4 +1,4 @@
-# collision-detector
+# mynt-eye-object-detection
 Using MYNT-EYE-D camera to detect people and measure the distance to them.
 
 ## Hardware Requirements
