@@ -3,15 +3,11 @@
 
 #include <opencv2/dnn.hpp>
 
-
-
 struct _bbox {
     int classId;
     float confidence;
     float x, y, w, h;
 };
-
-
 
 class CDNeuralNet{
 private:
