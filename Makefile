@@ -1,6 +1,3 @@
-## Build Options:
-NETWORK_DISPLAY = 0
-LOCAL_DISPLAY = 1
 
 ######
 ######   What are we building?
@@ -19,20 +16,13 @@ OBJECTS += CDNeuralNet.o
 ######
 
 CPPFLAGS = -std=c++11
-ifeq ($(LOCAL_DISPLAY), 1)
-CPPFLAGS += -DUSE_LOCAL_DISPLAY
-endif
-
-ifeq ($(NETWORK_DISPLAY), 1)
-CPPFLAGS += -DUSE_NETWORK_DISPLAY -DUSE_SCANLINE
-OBJECTS += UdpSender.o
-endif
 
 CPPFLAGS += -DWITH_OPENCV 
+CPPFLAGS += -DOPENCV 
 #-DWITH_OPENCV4
-CPPFLAGS += -I/usr/local/include/opencv4/ #OpenCV4 path
+CPPFLAGS += -I/usr/local/include/opencv4/opencv2 #OpenCV4 path
 CPPFLAGS += -O3
-#CPPFLAGS += -g
+CPPFLAGS += -g
 
 LD = g++
 
@@ -40,6 +30,7 @@ LD = g++
 LDFLAGS = -Wall -O3 -std=c++11     -rdynamic
 LDFLAGS += -pthread
 LDFLAGS += -Wl,-rpath,~/MYNT-EYE-D-SDK/3rdparty/eSPDI/linux/x64 #MYNT-EYE-D SDK path
+LDFLAGS += -g
 LDLIBS += -lmynteye_depth
 LDLIBS += $(shell pkg-config --libs opencv4)
 #LDLIBS += -leSPDI

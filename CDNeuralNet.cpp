@@ -26,8 +26,6 @@ CDNeuralNet::CDNeuralNet(std::string modelPath, std::string configPath) {
 }
 
 
-
-
 void CDNeuralNet::detect(cv::Mat frame) {
 
 	// Create a 4D blob from a frame.

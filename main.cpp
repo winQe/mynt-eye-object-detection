@@ -30,9 +30,9 @@ using namespace MYNTEYE_NAMESPACE;
 
 
 // The pre-trained neural-network for people detection:
-const char* nn_weightfile = "darknet/yolov3-tiny.weights";
-const char* nn_cfgfile = "darknet/cfg/yolov3-tiny.cfg";
-const char* nn_meta_file = "darknet/cfg/coco.data";
+const char* nn_weightfile = "/home/adin/mynt-eye-object-detection/darknet/yolov3-tiny.weights";
+const char* nn_cfgfile = "/home/adin/mynt-eye-object-detection/darknet/cfg/yolov3-tiny.cfg";
+const char* nn_meta_file = "/home/adin/mynt-eye-object-detection/darknet/cfg/coco.data";
 
 
 double gettimeofday_as_double() {
@@ -95,6 +95,7 @@ int main(int argc, char* argv[]) {
 	if (!util::select(cam, &dev_info)) {
 		return 1;
 	}
+	
 	util::print_stream_infos(cam, dev_info.index);
 
 	cout << "Open device: " << dev_info.index << ", " << dev_info.name << endl << endl;
@@ -147,6 +148,7 @@ int main(int argc, char* argv[]) {
 	cv::namedWindow("MYNT-EYE-D", cv::WINDOW_NORMAL); 
 
 	cv::Mat imD;
+	int count=0;
 	while (true) {
 
 		cam.WaitForStream();
@@ -274,6 +276,7 @@ int main(int argc, char* argv[]) {
 
 		//gettimeofday(&tv, NULL);
 		//printf("ts: %ld.%06ld\n", tv.tv_sec, tv.tv_usec);
+		count++;
 	}
 
 	return 0;
