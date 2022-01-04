@@ -1,8 +1,5 @@
-# collision-detector
-Using an RGB-D (depth) camera, detect people and measure the distance to them.  Originally created as a safety device for construction equipment.
-
-![screenshot](/docs/screenshot.png?raw=true)
-
+# mynt-eye-object-detection
+Using MYNT-EYE-D camera to detect people and measure the distance to them.
 
 ## Hardware Requirements
 
@@ -13,4 +10,6 @@ Using an RGB-D (depth) camera, detect people and measure the distance to them.  
 * the MYNT-EYE-D sdk
 * OpenCV 4.1 with DNN module
 
-
+## Usage
+* `make all`  
+* `./alertIfTooClose`
