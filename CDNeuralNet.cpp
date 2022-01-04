@@ -81,9 +81,9 @@ void CDNeuralNet::detect(cv::Mat frame) {
 				cv::Point classIdPoint;
 				double confidence;
 				minMaxLoc(scores, 0, &confidence, 0, &classIdPoint);
-				if (confidence > 0.2) {
+				if (confidence > 0.5) {
 					int classId = classIdPoint.x;
-					//printf(" class: %d, conf: %0.2f\n", classId, confidence);
+					printf(" class: %d, conf: %0.2f\n", classId, confidence);
 					bboxes[bboxIdx][count].classId = classId;
 					bboxes[bboxIdx][count].confidence = confidence;
 					bboxes[bboxIdx][count].x = data[0];
@@ -110,7 +110,7 @@ ssize_t CDNeuralNet::get_output_boxes(struct _bbox *buf, size_t len) {
 		if (count > len) {
 			break;
 		}
-		if (bboxes[bboxIdx][i].confidence > 0.4 && bboxes[bboxIdx][i].classId == 0) {
+		if (bboxes[bboxIdx][i].confidence > 0.8 && bboxes[bboxIdx][i].classId == 0) {
 			buf[count].classId = bboxes[bboxIdx][i].classId;
 			buf[count].confidence = bboxes[bboxIdx][i].confidence;
 			buf[count].x = bboxes[bboxIdx][i].x;

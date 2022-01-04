@@ -30,8 +30,8 @@ using namespace MYNTEYE_NAMESPACE;
 
 
 // The pre-trained neural-network for people detection:
-const char* nn_weightfile = "/home/adin/mynt-eye-object-detection/darknet/yolov3-tiny.weights";
-const char* nn_cfgfile = "/home/adin/mynt-eye-object-detection/darknet/cfg/yolov3-tiny.cfg";
+const char* nn_weightfile = "/home/adin/mynt-eye-object-detection/darknet/yolov4.weights";
+const char* nn_cfgfile = "/home/adin/mynt-eye-object-detection/darknet/cfg/yolov4.cfg";
 const char* nn_meta_file = "/home/adin/mynt-eye-object-detection/darknet/cfg/coco.data";
 
 
